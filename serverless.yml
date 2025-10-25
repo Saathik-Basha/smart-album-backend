@@ -1,0 +1,102 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: saathik
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: backend
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: smart-album
+
+functions:
+  savePhoto:
+    handler: functions/savePhotos.savePhoto
+    timeout: 25
+    events:
+      - httpApi:
+          path: /
+          method: post
+  getPhotos:
+    handler: functions/getPhotos.getPhotos        
+    events: 
+      - httpApi: 
+          path: /
+          method: get
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  environment:
+    ORIGINAL_BUCKET_NAME: ${self:service}-public-photos-${sls:stage}
+    THUMBNAIL_BUCKET_NAME: ${self:service}-public-thumbs-${sls:stage} 
+    PHOTOS_TABLE: ${self:service}-rekognition-photos-${sls:stage}
+  # Uncomment to easily set up a custom domain. Read the docs for more details:
+  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
+  # domain: api.example.com
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+          - "s3:*"
+          Resource: 
+          - "arn:aws:s3:::${self:service}-public-photos-${sls:stage}"
+          - "arn:aws:s3:::${self:service}-public-photos-${sls:stage}/*"
+        - Effect: Allow
+          Action:
+          - "s3:*"
+          Resource: 
+          - "arn:aws:s3:::${self:service}-public-thumbs-${sls:stage}" 
+          - "arn:aws:s3:::${self:service}-public-thumbs-${sls:stage}/*" 
+        - Effect: Allow
+          Action: 
+            - "rekognition:detectLabels"
+          Resource: "*"
+        - Effect: Allow
+          Action: 
+          - 'dynamodb:PutItem'    
+          - 'dynamodb:Get*'    
+          - 'dynamodb:Scan'    
+          - 'dynamodb:Query'    
+          - 'dynamodb:UpdateItem'    
+          - 'dynamodb:DeleteItem'    
+          Resource: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-rekognition-photos-${sls:stage}"
+resources:
+  Resources:
+    PhotosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-rekognition-photos-${sls:stage} 
+        AttributeDefinitions:
+          - AttributeName: primary_key
+            AttributeType: S
+        KeySchema:
+          - AttributeName: primary_key
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    PhotoBucket: 
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-public-photos-${sls:stage} 
+    PhotoBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref PhotoBucket
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Principal: "*"
+              Action: s3:GetObject
+              Resource: !Sub "${PhotoBucket.Arn}/*"
+    ThumbsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: ${self:service}-public-thumbs-${sls:stage}
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Principal: "*"
+              Action: s3:GetObject
+              Resource: arn:aws:s3:::${self:service}-public-thumbs-${sls:stage}/*
+plugins:
+  - serverless-offline
