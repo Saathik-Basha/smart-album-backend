@@ -6,7 +6,7 @@ const { dynamoDb } = require("../const/providers");
 
 exports.getPhotos = async (event) => {
   
-  const { limit, startKey } = event.queryStringParameters;
+  const { limit, startKey } = event.queryStringParameters || {};
 
     const ExclusiveStartKey = {
         primary_key: startKey,
