@@ -12,6 +12,7 @@ functions:
       - httpApi:
           path: /
           method: post
+          cors: true
   getPhotos:
     handler: functions/getPhotos.getPhotos        
     events: 

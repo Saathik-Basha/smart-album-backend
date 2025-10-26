@@ -68,12 +68,31 @@ async function saveFile(file) {
 }
 
 exports.savePhoto = async (event) => {
-  const { files } = await parser.parse(event);
-  const filesData = files.map(saveFile);
+  try {
+    const { files } = await parser.parse(event);
+    const filesData = files.map(saveFile);
 
-  const results = await Promise.all(filesData);
-  return {
-    statusCode: 200,
-    body: JSON.stringify(results),
-  };
+    const results = await Promise.all(filesData);
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(results),
+    };
+  } catch (error) {
+    console.error("Error saving photo:", error);
+
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify({ message: "Failed to save photo", error: error.message }),
+    };
+  }
 };
+
