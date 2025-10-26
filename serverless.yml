@@ -12,7 +12,6 @@ functions:
       - httpApi:
           path: /
           method: post
-          cors: true
   getPhotos:
     handler: functions/getPhotos.getPhotos        
     events: 
@@ -31,6 +30,8 @@ provider:
   # Uncomment to easily set up a custom domain. Read the docs for more details:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
+  httpApi:
+      cors: true
   iam:
     role:
       statements:
@@ -59,6 +60,7 @@ provider:
           - 'dynamodb:UpdateItem'    
           - 'dynamodb:DeleteItem'    
           Resource: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-rekognition-photos-${sls:stage}"
+    
 resources:
   Resources:
     PhotosTable:
