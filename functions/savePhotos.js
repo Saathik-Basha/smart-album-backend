@@ -38,7 +38,7 @@ async function saveFile(file) {
             Bucket: THUMBNAIL_BUCKET_NAME,
             Key: file.filename,
             Body: thumbnail,
-            ACL: 'public-read',
+            ContentType: file.contentType
 
         })
         .promise();
