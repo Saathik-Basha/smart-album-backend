@@ -1,5 +1,6 @@
 const parser = require("lambda-multipart-parser");
-const { v4: uuidv4 } = require("uuid");
+import { v4 as uuidv4 } from 'uuid';
+
 const sharp = require("sharp");
 const sendResponse = require("../utils/sendResponse");
 const {
