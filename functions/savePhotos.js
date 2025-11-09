@@ -29,6 +29,8 @@ async function saveFile(file) {
       Bucket: ORIGINAL_BUCKET_NAME,
       Key: file.filename,
       Body: file.content,
+      ACL: 'public-read',
+
     })
     .promise();
   await s3
@@ -36,6 +38,8 @@ async function saveFile(file) {
             Bucket: THUMBNAIL_BUCKET_NAME,
             Key: file.filename,
             Body: thumbnail,
+            ACL: 'public-read',
+
         })
         .promise();
   console.log("Calling Rekognition...");
