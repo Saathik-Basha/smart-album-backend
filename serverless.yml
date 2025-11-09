@@ -104,18 +104,18 @@ resources:
           IgnorePublicAcls: false
           RestrictPublicBuckets: false
 
-    ThumbsBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:service}-public-thumbs-${sls:stage}
-        OwnershipControls:
-          Rules:
-            - ObjectOwnership: BucketOwnerPreferred   # 👈 ensures thumbnails are bucket-owned
-        PublicAccessBlockConfiguration:
-          BlockPublicAcls: false
-          BlockPublicPolicy: false
-          IgnorePublicAcls: false
-          RestrictPublicBuckets: false
+    # ThumbsBucket:
+    #   Type: AWS::S3::Bucket
+    #   Properties:
+    #     BucketName: ${self:service}-public-thumbs-${sls:stage}
+    #     OwnershipControls:
+    #       Rules:
+    #         - ObjectOwnership: BucketOwnerPreferred   # 👈 ensures thumbnails are bucket-owned
+    #     PublicAccessBlockConfiguration:
+    #       BlockPublicAcls: false
+    #       BlockPublicPolicy: false
+    #       IgnorePublicAcls: false
+    #       RestrictPublicBuckets: false
 
     PhotoBucketPolicy:
       Type: AWS::S3::BucketPolicy
