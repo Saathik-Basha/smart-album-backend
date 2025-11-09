@@ -18,6 +18,20 @@ functions:
       - httpApi: 
           path: /
           method: get
+  updatePhoto:
+    handler: functions/updatePhoto.updatePhoto
+    timeout: 25
+    events:
+      - httpApi:
+          path: /update
+          method: post
+  deletePhoto:
+    handler: functions/deletePhoto.deletePhoto
+    timeout: 25
+    events:
+      - httpApi:
+          path: /delete
+          method: delete  
 
 provider:
   name: aws
