@@ -29,7 +29,7 @@ async function saveFile(file) {
       Bucket: ORIGINAL_BUCKET_NAME,
       Key: file.filename,
       Body: file.content,
-      ACL: 'public-read',
+      
 
     })
     .promise();
