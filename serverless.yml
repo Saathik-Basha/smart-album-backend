@@ -80,7 +80,7 @@ resources:
     PhotosTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:service}-rekognition-photos-${sls:stage} 
+        TableName: ${self:service}-rekognition-photos-${sls:stage}
         AttributeDefinitions:
           - AttributeName: primary_key
             AttributeType: S
@@ -90,10 +90,33 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    PhotoBucket: 
+
+    PhotoBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:service}-public-photos-${sls:stage} 
+        BucketName: ${self:service}-public-photos-${sls:stage}
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerPreferred   # 👈 ensures bucket owns new uploads
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+
+    ThumbsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-public-thumbs-${sls:stage}
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerPreferred   # 👈 ensures thumbnails are bucket-owned
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+
     PhotoBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -104,15 +127,17 @@ resources:
               Principal: "*"
               Action: s3:GetObject
               Resource: !Sub "${PhotoBucket.Arn}/*"
+
     ThumbsBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
-        Bucket: ${self:service}-public-thumbs-${sls:stage}
+        Bucket: !Ref ThumbsBucket
         PolicyDocument:
           Statement:
             - Effect: Allow
               Principal: "*"
               Action: s3:GetObject
-              Resource: arn:aws:s3:::${self:service}-public-thumbs-${sls:stage}/*
+              Resource: !Sub "${ThumbsBucket.Arn}/*"
+
 plugins:
   - serverless-offline
