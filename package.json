@@ -13,11 +13,11 @@
   "dependencies": {
     "aws-sdk": "^2.1692.0",
     "lambda-multipart-parser": "^1.0.1",
-    "serverless-offline": "^14.4.0",
     "sharp": "^0.34.4",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "serverless-dotenv-plugin": "^6.0.0"
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-offline": "^13.3.2"
   }
 }
