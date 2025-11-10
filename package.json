@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-jwt-verify": "^5.1.1",
     "aws-sdk": "^2.1692.0",
     "lambda-multipart-parser": "^1.0.1",
     "sharp": "^0.34.4",

@@ -13,6 +13,7 @@ functions:
           method: post
   login:
     handler: functions/login.login
+    timeout: 30
     events:
       - httpApi:
           path: /login
