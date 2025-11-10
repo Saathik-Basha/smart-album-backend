@@ -5,6 +5,18 @@ app: backend
 service: smart-album
 
 functions:
+  register:
+    handler: functions/register.register
+    events:
+      - httpApi:
+          path: /register
+          method: post
+  login:
+    handler: functions/login.login
+    events:
+      - httpApi:
+          path: /login
+          method: post
   savePhoto:
     handler: functions/savePhotos.savePhoto
     timeout: 25
@@ -12,12 +24,16 @@ functions:
       - httpApi:
           path: /
           method: post
+          authorizer: 
+            name: userAuthoriser
   getPhotos:
     handler: functions/getPhotos.getPhotos        
     events: 
       - httpApi: 
           path: /
           method: get
+          authorizer: 
+            name: userAuthoriser
   updatePhoto:
     handler: functions/updatePhoto.updatePhoto
     timeout: 25
@@ -25,6 +41,8 @@ functions:
       - httpApi:
           path: /update
           method: post
+          authorizer: 
+            name: userAuthoriser
   deletePhoto:
     handler: functions/deletePhoto.deletePhoto
     timeout: 25
@@ -32,12 +50,17 @@ functions:
       - httpApi:
           path: /delete
           method: delete  
+          authorizer: 
+            name: userAuthoriser
 
 provider:
   name: aws
   runtime: nodejs20.x
   region: us-east-1
   environment:
+    USER_POOL: ${env:USER_POOL_ID} 
+    USER_POOL_CLIENT: ${env:USER_POOL_CLIENT_ID}
+    # { Ref: UserClient }
     ORIGINAL_BUCKET_NAME: ${self:service}-public-photos-${sls:stage}
     THUMBNAIL_BUCKET_NAME: ${self:service}-public-thumbs-${sls:stage} 
     PHOTOS_TABLE: ${self:service}-rekognition-photos-${sls:stage}
@@ -45,7 +68,15 @@ provider:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
   httpApi:
-      cors: true
+    cors: true
+    authorizers:
+      userAuthoriser:
+        identitySource: $request.header.Authorization
+        issuerUrl: "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_LIJUJNtDL"
+        audience:
+          - "7mtrhplhsq2573s5uqkiaek9ps"
+
+
   iam:
     role:
       statements:
@@ -144,4 +175,9 @@ resources:
               Action: s3:GetObject
               Resource: arn:aws:s3:::${self:service}-public-thumbs-${sls:stage}/*
 plugins:
+  - serverless-dotenv-plugin
   - serverless-offline
+custom:
+  serverless-offline:
+    noAuth: true
+
